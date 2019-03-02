@@ -40,12 +40,26 @@ app.get("/subject", function(req, res) {
 
 
 //handle GET requests for teacher depends on subjectId
-app.get("/findTeacher", function(req, res) {
-  db.findTeacher(req.body.subjectId, function(err, teachers) {
-    if (err) console.log("findteacherERROR", err);
-    res.json(teachers);
+// RETURN NULL
+
+app.post("/findTeacher", function(req, res) {
+    console.log('findTeacher: ', req.body.subjectId);
+    
+    if (req.body.subjectId) {
+      db.findTeacher(req.body.subjectId, function(teachers) {
+        res.json(teachers);
+      });
+    } else {
+      db.findTeacher(req.body.subjectId, function(err, teachers) {
+        if (err) console.log("findteacherERROR", err);
+        res.json(teachers);
+      });
+    }
   });
-});
+
+
+
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////

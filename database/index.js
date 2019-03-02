@@ -25,7 +25,6 @@ const TeacherSchema = new Schema({
   description: String,
   image: String,
   subjectId: { type: mongoose.Schema.ObjectId, ref: "Subject" },
-  courseId: { type: mongoose.Schema.ObjectId, ref: "Course" }
 });
 
 const CourseSchema = new Schema({
@@ -33,6 +32,7 @@ const CourseSchema = new Schema({
   price: Number,
   view: Number,
   duration: Number,
+  teacherId: { type: mongoose.Schema.ObjectId, ref: "Teacher" }
 });
 
 const Subject = mongoose.model("Subject", SubSchema);
@@ -42,7 +42,7 @@ const Course = mongoose.model("Course", CourseSchema);
 //saving subject to Subjects table
 const saveSubject = (data, cb) => {
   let sub = new Subject({
-    name: data["name"],
+    name: data["name"]
   });
   sub.save(function(err) {
     if (err) throw err;
@@ -56,7 +56,7 @@ const saveTeacher = (data, cb) => {
     name: data["name"],
     description: data["description"],
     image: data["image"],
-    subjectId: data["subjectId"],
+    subjectId: data["subjectId"]
   });
   teacherNew.save(function(err) {
     if (err) throw err;
@@ -70,7 +70,7 @@ const saveCourse = (data, cb) => {
     name: data["name"],
     price: data["price"],
     view: data["view"],
-    duration: data["duration"],
+    duration: data["duration"]
   });
   courseNew.save(function(err) {
     if (err) throw err;
@@ -78,27 +78,25 @@ const saveCourse = (data, cb) => {
   });
 };
 
-
 //finding all teacher based on the provided subjectId
 //using aggregation to get all the teacher details from teachers table
 const findTeacher = (subjectId, callback) => {
   db.collection("teachers")
     .aggregate([
-      { $match: { subjectId: ObjectId(subjectId) } },
       {
         $lookup: {
           from: "teachers",
-          foreignField: "_id",
+          pipeline: [{ $match: { subjectId: ObjectId(subjectId) } }],
+          as: "teachers"
         }
       }
     ])
     .toArray(function(err, res) {
-      console.log(res, err);
+      console.log('hiiiiiii',res, err);
       if (err) callback(err, null);
       callback(null, res);
     });
 };
-
 
 module.exports.Subject = Subject;
 module.exports.Teacher = Teacher;
@@ -108,4 +106,3 @@ module.exports.saveSubject = saveSubject;
 module.exports.saveTeacher = saveTeacher;
 module.exports.findTeacher = findTeacher;
 module.exports.saveCourse = saveCourse;
-
